@@ -13,7 +13,7 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -21,11 +21,8 @@ import Image from "next/image";
 export default function HomePage() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [postContent, setPostContent] = useState("");
-
   const [posts, setPosts] = useState([]);
-
   const router = useRouter();
 
   // Getting Logged in User!
@@ -39,7 +36,6 @@ export default function HomePage() {
           setUserData(docSnap.data());
         }
       } else {
-        // Not logged in, redirect to login
         router.push("/login");
       }
       setLoading(false);
@@ -62,6 +58,32 @@ export default function HomePage() {
       setPostContent(""); // Clear Input
     } catch (error) {
       console.error("Error creating post:", error.message);
+    }
+  };
+
+  // Getting Posts data from Firestore!
+  useEffect(() => {
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      // onSnapshot is a Real time listener
+      const fetchedPosts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPosts(fetchedPosts);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Logout functionality!
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error.message);
     }
   };
 
@@ -96,22 +118,6 @@ export default function HomePage() {
     }
   };
 
-  // Getting Posts data from Firestore!
-  useEffect(() => {
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      // onSnapshot is a Real time listener
-      const fetchedPosts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setPosts(fetchedPosts);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   // Handling the like post!
   const handleLike = async (postId, currentLikes = []) => {
     const user = auth.currentUser;
@@ -141,9 +147,11 @@ export default function HomePage() {
       <div className="bg-white p-4 rounded-xl shadow-lg w-full max-w-xl">
         <div className="display flex justify-between">
           <h2 className="text-2xl font-semibold mb-2 text-gray-700">
-            Welcome, {userData.name}!
+            Welcome, {userData?.name}!
           </h2>
-          <p className="text-2xl cursor-pointer">📤</p>
+          <p className="text-2xl cursor-pointer" onClick={logout}>
+            📤
+          </p>
         </div>
         <div className="flex mb-4">
           <Image
@@ -180,12 +188,14 @@ export default function HomePage() {
             >
               <div className="flex justify-between items-center">
                 <p className="text-gray-800 mb-2">{post.content}</p>
-                <button
-                  className="text-red-600 text-[18px] cursor-pointer font-semibold"
-                  onClick={() => deletePost(post.id)}
-                >
-                  X
-                </button>
+                {post.createdByUid === auth.currentUser?.uid && (
+                  <button
+                    className="text-red-600 text-[18px] cursor-pointer font-semibold"
+                    onClick={() => deletePost(post.id)}
+                  >
+                    X
+                  </button>
+                )}
               </div>
               <div className="text-sm text-gray-600 flex justify-between">
                 <span>By: {post.createdBy}</span>
