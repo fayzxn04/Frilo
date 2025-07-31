@@ -13,7 +13,6 @@ export default function Signup() {
   const router = useRouter();
 
   // Register User!
-
   const register = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -41,26 +40,26 @@ export default function Signup() {
   };
 
   return (
-    <main className="h-screen w-[350px] text-center flex flex-col items-center justify-start bg-blue-100 mx-auto">
-      <div className=" mb-20">
-        <h1 className="text-4xl">Frilo</h1>
-      </div>
-      <div>
+    <main className="flex items-center justify-center min-h-screen bg-opacity-40 ">
+      <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
+        <h1 className="text-3xl font-semibold mb-3 text-center"> X </h1>
+        <h2 className="text-2xl text-black font-bold mb-8 text-center">
+          Create your account
+        </h2>
         <input
           type="text"
-          placeholder="Full Name"
+          placeholder="Name"
+          className="py-2 px-4 border border-gray-300 w-full mb-4 rounded-md"
           value={name}
-          className="border-2 border-red-400 px-4 py-2 mb-2"
           onChange={(event) => {
             setName(event.target.value);
           }}
         />
-
         <input
           type="email"
-          placeholder="Enter your email"
+          placeholder="Email"
+          className="py-2 px-4 border border-gray-300 w-full mb-4 rounded-md"
           value={registerEmail}
-          className="border-2 border-red-400 px-4 py-2 mb-2"
           onChange={(event) => {
             setRegisterEmail(event.target.value);
           }}
@@ -68,29 +67,29 @@ export default function Signup() {
         <input
           type="password"
           placeholder="Password"
+          className="py-2 px-4 border border-gray-300 w-full mb-6 rounded-md"
           value={registerPassword}
-          className="border-2 border-red-400 px-4 py-2 mb-4"
           onChange={(event) => {
             setRegisterPassword(event.target.value);
           }}
         />
 
-        <div
-          className="border-2 border-red-400 px-4 py-2 mb-6 cursor-pointer"
+        <button
+          className="bg-gray-700 text-white px-4 py-2 w-full rounded-md mb-4 cursor-pointer"
           onClick={register}
         >
-          Create User
-        </div>
-      </div>
+          Sign up
+        </button>
 
-      <div>
-        Have an account?
-        <span
-          onClick={() => router.push("/login")}
-          className="border-2 border-red-400 px-2 py-1 cursor-pointer mr-4"
-        >
-          Log in
-        </span>
+        <div className="text-center">
+          <span className="text-sm"> Already have an account? </span>
+          <button
+            onClick={() => router.push("/login")}
+            className="bg-gray-500 text-white px-4 py-2 rounded-md ml-3 cursor-pointer"
+          >
+            Sign in
+          </button>
+        </div>
       </div>
     </main>
   );

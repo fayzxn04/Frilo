@@ -28,47 +28,41 @@ export default function Login() {
   };
 
   return (
-    <main className="h-screen w-[350px] text-center flex flex-col items-center justify-start bg-blue-100 mx-auto">
-      <div className=" mb-20">
-        <h1 className="text-4xl">Frilo</h1>
-      </div>
-
-      <div>
+    <main className="flex items-center justify-center min-h-screen  bg-opacity-40 ">
+      <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
+        <h1 className="text-3xl font-semibold mb-3 text-center">X</h1>
+        <h2 className="text-2xl text-black mb-8 font-semibold">Sign in to X</h2>
         <input
           type="email"
-          placeholder="Enter your email"
-          className="border-2 border-red-400 px-4 py-2 mb-2"
+          placeholder="Email"
           value={loginEmail}
-          onChange={(event) => {
-            setLoginEmail(event.target.value);
-          }}
+          onChange={(event) => setLoginEmail(event.target.value)}
+          className="px-4 py-2 border border-gray-300 w-full rounded-md mb-4  "
         />
         <input
           type="password"
           placeholder="Password"
-          className="border-2 border-red-400 px-4 py-2 mb-4"
           value={loginPassword}
-          onChange={(event) => {
-            setLoginPassword(event.target.value);
-          }}
+          onChange={(event) => setLoginPassword(event.target.value)}
+          className="px-4 py-2 border border-gray-300 w-full rounded-md mb-4"
         />
 
-        <div
-          className="border-2 border-red-400 px-4 py-2 mb-6 cursor-pointer "
+        <button
+          className="w-full rounded-md bg-gray-700 px-4 py-2 text-white cursor-pointer mb-4"
           onClick={login}
         >
-          Login
-        </div>
-      </div>
+          Sign in
+        </button>
 
-      <div>
-        Don&rsquo;t have an account?{" "}
-        <span
-          onClick={() => router.push("/signup")}
-          className="border-2 border-red-400 px-2 py-1 cursor-pointer"
-        >
-          Sign up
-        </span>
+        <div className="text-center">
+          <span className="text-sm"> Don&rsquo;t have an account? </span>
+          <button
+            onClick={() => router.push("/signup")}
+            className=" bg-gray-500 px-4 py-2 cursor-pointer ml-3 text-white rounded-md"
+          >
+            Sign up
+          </button>
+        </div>
       </div>
     </main>
   );
