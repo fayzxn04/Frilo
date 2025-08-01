@@ -19,11 +19,15 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function HomePage() {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [postContent, setPostContent] = useState("");
-  const [posts, setPosts] = useState([]);
-  const router = useRouter();
+  const [userData, setUserData] = useState(null); // Done
+  const [loading, setLoading] = useState(true); // Done
+  const [postContent, setPostContent] = useState(""); //Done
+  const [posts, setPosts] = useState([]); // For setting Posts Done
+
+  const [isEditing, setIsEditing] = useState(false); // For Edit Button Done
+  const [editPostId, setEditPostId] = useState(null); // For Edit Button Done
+
+  const router = useRouter(); //Done
 
   // Getting Logged in User!
   useEffect(() => {
@@ -47,14 +51,25 @@ export default function HomePage() {
   const createPost = async () => {
     if (!postContent.trim()) return toast.warn("Post content cannot be empty");
     try {
-      const postRef = await addDoc(collection(db, "posts"), {
-        content: postContent,
-        createdBy: userData.name,
-        createdByUid: auth.currentUser.uid,
-        createdAt: serverTimestamp(),
-        likes: [],
-      });
-
+      if (isEditing && editPostId) {
+        const postRef = doc(db, "posts", editPostId);
+        await updateDoc(postRef, {
+          content: postContent,
+          createdAt: serverTimestamp(),
+        });
+        toast.success("Post updated");
+        setIsEditing(false);
+        setEditPostId(null);
+      } else {
+        await addDoc(collection(db, "posts"), {
+          content: postContent,
+          createdBy: userData.name,
+          createdByUid: auth.currentUser.uid,
+          createdAt: serverTimestamp(),
+          likes: [],
+        });
+        toast.success("Post created");
+      }
       setPostContent(""); // Clear Input
     } catch (error) {
       console.error("Error creating post:", error.message);
@@ -116,6 +131,13 @@ export default function HomePage() {
     } catch (error) {
       console.error(error.message);
     }
+  };
+
+  // Handling The Edit Post!
+  const handleEdit = (postId, content) => {
+    setPostContent(content);
+    setIsEditing(true);
+    setEditPostId(postId);
   };
 
   // Handling the like post!
@@ -186,7 +208,7 @@ export default function HomePage() {
               key={post.id}
               className="bg-gray-100 p-4 rounded-lg mb-4 shadow"
             >
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <p className="text-gray-800 mb-2">{post.content}</p>
                 {post.createdByUid === auth.currentUser?.uid && (
                   <button
@@ -196,7 +218,30 @@ export default function HomePage() {
                     X
                   </button>
                 )}
+              </div> */}
+              <div className="flex justify-between items-center">
+                <p className="text-gray-800 mb-2">
+                  {post.content}
+                  {post.createdByUid === auth.currentUser?.uid && (
+                    <button
+                      className="ml-2 text-sm text-blue-600"
+                      onClick={() => handleEdit(post.id, post.content)}
+                      title="Edit Post"
+                    >
+                      ✏️
+                    </button>
+                  )}
+                </p>
+                {post.createdByUid === auth.currentUser?.uid && (
+                  <button
+                    className="text-red-600 text-[18px] cursor-pointer font-semibold"
+                    onClick={() => deletePost(post.id)}
+                  >
+                    X
+                  </button>
+                )}
               </div>
+
               <div className="text-sm text-gray-600 flex justify-between">
                 <span>By: {post.createdBy}</span>
                 <span>
